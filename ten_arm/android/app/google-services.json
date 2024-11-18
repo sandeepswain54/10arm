@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "167015213717",
+    "project_id": "arm-b80e8",
+    "storage_bucket": "arm-b80e8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:167015213717:android:aeb5084a5d938b058a499c",
+        "android_client_info": {
+          "package_name": "com.example.ten_arm"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAOKFRpxrTSb-F8KNZxCyU3JwjKrg9zRHA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
