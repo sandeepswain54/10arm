@@ -1,14 +1,14 @@
 class Persistent {
   static List<String> jobCategoryList = [
-    "NIT Rourkela",
-    "IIT Bhubaneswar",
+    "odisha",
+    " Bhubaneswar",
     "KIIT University",
-    "Trident",
-    "Silicon University",
-    "VSSUT Burla",
-    "centurion university",
-    "IIM Sambalpur",
-    "GCE Kalahandi",
+    "puri",
+    "paradip",
+    " Burla",
+    "centurion u",
+    " Sambalpur",
+    "Kalahandi",
   ];
   static void updateJobCategoryList(List<String> newCategories) {
     jobCategoryList = newCategories;

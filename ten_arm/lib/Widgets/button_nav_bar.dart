@@ -112,16 +112,16 @@ class ButtonNavBar extends StatelessWidget {
       onTap: (index) {
         if (index == 0) {
           Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: (_) => HomeScreen()));
+              context, MaterialPageRoute(builder: (_) => Upload()));
         } else if (index == 1) {
           Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: (_) => Search()));
+              context, MaterialPageRoute(builder: (_) => Upload()));
         } else if (index == 2) {
           Navigator.pushReplacement(
               context, MaterialPageRoute(builder: (_) => Upload()));
         } else if (index == 3) {
           Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: (_) => Profile()));
+              context, MaterialPageRoute(builder: (_) => Upload()));
         } else if (index == 4) {
           _logout(context);
         }

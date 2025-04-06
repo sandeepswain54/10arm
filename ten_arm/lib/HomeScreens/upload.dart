@@ -10,7 +10,7 @@ class Upload extends StatefulWidget {
 
 class _UploadState extends State<Upload> {
   final TextEditingController _jobCategoryController =
-      TextEditingController(text: "Choose your college/University");
+      TextEditingController(text: "Choose Unsafe Location Area");
 
   final TextEditingController _jobtitleController = TextEditingController();
 
@@ -18,7 +18,7 @@ class _UploadState extends State<Upload> {
       TextEditingController();
 
   final TextEditingController _jobDeadlineController =
-      TextEditingController(text: "Project Deadline Date");
+      TextEditingController(text: "Safe area date");
 
   final _formkey = GlobalKey<FormState>();
   DateTime? picked;
@@ -42,7 +42,7 @@ class _UploadState extends State<Upload> {
     required bool enabled,
     required Function fct,
     required int maxLength,
-    InputDecoration? decoration, // Optional parameter for decoration
+    InputDecoration? decoration,
   }) {
     return Padding(
       padding: const EdgeInsets.all(5),
@@ -61,7 +61,7 @@ class _UploadState extends State<Upload> {
           enabled: enabled,
           key: ValueKey(valueKey),
           style: const TextStyle(color: Colors.white),
-          maxLines: valueKey == "JobDescription" ? 2 : 1,
+          maxLines: valueKey == "Unsafe Area Description" ? 2 : 1,
           maxLength: maxLength,
           keyboardType: TextInputType.text,
           decoration: decoration ??
@@ -87,7 +87,7 @@ class _UploadState extends State<Upload> {
           return AlertDialog(
             backgroundColor: Colors.black54,
             title: const Text(
-              "Student Preferences",
+              "Unsafe area list",
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 20, color: Colors.white),
             ),
@@ -140,22 +140,60 @@ class _UploadState extends State<Upload> {
         });
   }
 
-  void _pickDateDialog() async{
-picked = await showDatePicker(context: context,
- initialDate: DateTime.now(), 
- firstDate: DateTime.now().subtract(
-  const Duration(days:0),
- ),
- lastDate: DateTime(2100),
- );
- if(picked!=null){
-     setState(() {
-       _jobDeadlineController.text="${picked!.year} - ${picked!.month} - ${picked!.day}";
-       deadlineDateTimeStamp = Timestamp.fromMicrosecondsSinceEpoch(picked!.microsecondsSinceEpoch);
+  void _pickDateDialog() async {
+    picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2100),
+    );
+    if (picked != null) {
+      setState(() {
+        _jobDeadlineController.text =
+            "${picked!.year} - ${picked!.month} - ${picked!.day}";
+        deadlineDateTimeStamp = Timestamp.fromMicrosecondsSinceEpoch(
+            picked!.microsecondsSinceEpoch);
+      });
+    }
+  }
 
-     });
- }
- 
+  Future<void> _uploadData() async {
+    if (_formkey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      try {
+        await FirebaseFirestore.instance.collection('reports').add({
+          'unsafeArea': _jobCategoryController.text,
+          'location': _jobtitleController.text,
+          'description': _jobDescriptionController.text,
+          'incidentDate': _jobDeadlineController.text,
+          'timestamp': deadlineDateTimeStamp ?? Timestamp.now(),
+        });
+
+        setState(() {
+          _isLoading = false;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Data uploaded successfully!")),
+        );
+
+        _jobCategoryController.clear();
+        _jobtitleController.clear();
+        _jobDescriptionController.clear();
+        _jobDeadlineController.clear();
+      } catch (error) {
+        setState(() {
+          _isLoading = false;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Failed to upload data: $error")),
+        );
+      }
+    }
   }
 
   @override
@@ -184,9 +222,7 @@ picked = await showDatePicker(context: context,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(
-                      height: 10,
-                    ),
+                    const SizedBox(height: 10),
                     const Align(
                       alignment: Alignment.center,
                       child: Padding(
@@ -201,12 +237,8 @@ picked = await showDatePicker(context: context,
                         ),
                       ),
                     ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    const Divider(
-                      thickness: 1,
-                    ),
+                    const SizedBox(height: 10),
+                    const Divider(thickness: 1),
                     Padding(
                       padding: EdgeInsets.all(8),
                       child: Form(
@@ -214,9 +246,9 @@ picked = await showDatePicker(context: context,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _textTitles(label: "Student Preferences"),
+                            _textTitles(label: "Unsafe area"),
                             _textFormFields(
-                              valueKey: 'StudentPreferences',
+                              valueKey: 'UnsafeArea',
                               controller: _jobCategoryController,
                               enabled: false,
                               fct: () {
@@ -224,83 +256,32 @@ picked = await showDatePicker(context: context,
                               },
                               maxLength: 50,
                             ),
-                            _textTitles(label: "Project Title:"),
+                            _textTitles(label: "Location:"),
                             _textFormFields(
-                                valueKey: "ProjectTitle",
+                                valueKey: "Location",
                                 controller: _jobtitleController,
                                 enabled: true,
                                 fct: () {},
                                 maxLength: 50),
-                            _textTitles(label: "Project Description :"),
+                            _textTitles(label: "Description:"),
                             _textFormFields(
-                                valueKey: "JobDescription",
+                                valueKey: "Description",
                                 controller: _jobDescriptionController,
                                 enabled: true,
                                 fct: () {},
                                 maxLength: 100),
-                            _textTitles(label: "Project Deadline Date :"),
-                            _textFormFields(
-                              valueKey: "JobDeadline",
-                              controller: _jobDeadlineController,
-                              enabled: false,
-                              fct: () {
-                                _pickDateDialog();
-                              },
-                              maxLength: 50,
-                              decoration: const InputDecoration(
-                                hintText: "Enter the deadline date",
-                                hintStyle: TextStyle(color: Colors.grey),
-                                filled: true,
-                                fillColor: Colors.black54,
-                                enabledBorder: UnderlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.black),
-                                ),
-                                focusedBorder: UnderlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.black),
-                                ),
-                              ),
-                            ),
                           ],
                         ),
                       ),
                     ),
                     Center(
-                      child: Padding(
-                        padding: EdgeInsets.only(bottom: 30),
-                        child: _isLoading
-                            ? const CircularProgressIndicator()
-                            : MaterialButton(
-                                onPressed: () {},
-                                color: Colors.black,
-                                elevation: 8,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(13),
-                                ),
-                                child: const Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 14),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        "Upload",
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 25),
-                                      ),
-                                      SizedBox(
-                                        width: 9,
-                                      ),
-                                      Icon(
-                                        Icons.upload,
-                                        color: Colors.white,
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              ),
-                      ),
+                      child: _isLoading
+                          ? CircularProgressIndicator()
+                          : MaterialButton(
+                              onPressed: _uploadData,
+                              color: Colors.black,
+                              child: Text("Upload", style: TextStyle(color: Colors.white)),
+                            ),
                     )
                   ],
                 ),
